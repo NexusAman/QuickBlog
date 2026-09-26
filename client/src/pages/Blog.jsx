@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import {useParams} from 'react-router'
-import {blog_data} from '../assets/assets'
+import {assets, blog_data} from '../assets/assets'
 import Navbar from '../components/Navbar'
+import Moment from 'moment'
 
 const Blog = () => {
   const {id} = useParams()
@@ -19,7 +20,19 @@ const Blog = () => {
   return data ? (
     <div>
       <Navbar />
-      {/* <h1>Blog</h1> */}
+
+      <div>
+        <p>Published on {Moment(data.createdAt).format('MMMM Do YYYY')}</p>
+        <h1>{data.title}</h1>
+        <h2>{data.subTitle}</h2>
+        <p>Michael Brown</p>
+      </div>
+
+      <div>
+        <img src={data.image} alt="" />
+        {/* blog description: */}
+        <div dangerouslySetInnerHTML={{__html: data.description}}></div>
+      </div>
     </div>
   ) : (
     <div>Loading...</div>
