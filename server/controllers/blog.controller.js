@@ -72,3 +72,13 @@ export const addBlog = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getAllBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ isPublished: true });
+    return res.status(200).json({ success: true, blogs });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
