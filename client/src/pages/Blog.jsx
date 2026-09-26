@@ -3,12 +3,16 @@ import {useParams} from 'react-router'
 import {assets, blog_data, comments_data} from '../assets/assets'
 import Navbar from '../components/Navbar'
 import Moment from 'moment'
+import Footer from '../components/Footer'
 
 const Blog = () => {
   const {id} = useParams()
   const [data, setData] = useState(null)
   const [comments, setComments] = useState([])
-
+  
+  const [name, setName] = useState('')
+  const [content, setContent] = useState('')
+  
   const fetchBlogData = async () => {
     const found_data = blog_data.find(item => item._id === id)
     setData(found_data)
@@ -23,6 +27,10 @@ const Blog = () => {
     fetchComments()
   }, [])
 
+  const addComment = async (e) => {
+    e.preventDefault();
+  }
+
   return data ? (
     <div className='relative'>
       <img src={assets.gradientBackground} alt="" className='absolute -top-50 -z-1 opacity-50' />
@@ -36,7 +44,7 @@ const Blog = () => {
         <p className='inline-block py-1 px-4 rounded-full mb-6 border text-sm border-primary/35 bg-primary/5 bg-primary/5 font-medium text-primary'>Michael Brown</p>
       </div>
 
-      <div className='mx-auto max-w-5xl md:mx:-auto my-10 mt-6'>
+      <div className='mx-auto max-w-5xl md:mx-auto my-10 mt-6'>
         <img src={data.image} alt="" className='rounded-3xl mb-5'/>
         {/* blog description: */}
         <div className='rich-text max-w-3xl mx-auto' dangerouslySetInnerHTML={{__html: data.description}}></div>
@@ -60,7 +68,34 @@ const Blog = () => {
             ))}
           </div>
         </div>
+
+        {/* Add Comment Section: (Comment box) */}
+        <div className='max-w-3xl mx-auto'>
+          <p className='font-semibold mb-4'>Add a comment</p>
+
+          <form onSubmit={addComment} className='flex flex-col flex-start gap-4 max-w-lg'>
+          
+            <input onChange={(e) => setName(e.target.value)} value={name} type='text' placeholder='Name' required className='w-full p-2 border border-gray-300 rounded outline-none'></input>
+          
+            <textarea onChange={(e) => setContent(e.target.value)} value={content} placeholder='Comment' className='w-full p-2 border border-gray-300 rounded outline-none h-48'></textarea>
+
+            <button type='submit' className='bg-primary text-white rounded p-2 px-8 hover:scale-102 transition-all cursor-pointer'>Submit</button>
+
+          </form>
+        </div>
+
+        {/* Share Buttons */}
+        <div className='my-24 max-w-3xl mx-auto'>
+          <p className='font-semibold my-4'>Share this article on social media</p>
+          <div className='flex'>
+            <img src={assets.facebook_icon} width={50} alt="Facebook" />
+            <img src={assets.twitter_icon} width={50} alt="Twitter" />
+            <img src={assets.googleplus_icon} width={50} alt="Google+" />
+          </div>
+        </div>
       </div>
+
+      <Footer />
 
     </div>
   ) : (
