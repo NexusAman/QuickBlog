@@ -54,6 +54,7 @@ export const addBlog = async (req, res) => {
     });
 
     const image = optimizedImageUrl;
+    const imageFileId = response.fileId;
 
     await Blog.create({
       title,
@@ -61,6 +62,7 @@ export const addBlog = async (req, res) => {
       description,
       category,
       image,
+      imageFileId,
       isPublished,
     });
 
@@ -87,7 +89,7 @@ export const getBlogById = async (req, res) => {
     const { blogId } = req.params;
     const blog = await Blog.findById(blogId);
 
-    if (!blog) {
+    if (!blog || blog.isPublished !== true) {
       return res
         .status(401)
         .json({ success: false, message: "Blog not found!" });
@@ -101,14 +103,28 @@ export const getBlogById = async (req, res) => {
 
 export const deleteBlogById = async (req, res) => {
   try {
-    const id = req.body;
+    const {id} = req.body;
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    await imagekit.files.delete(blog.imageFileId);
     await Blog.findByIdAndDelete(id);
-    return res.status(200).json({
+
+    return res.json({
       success: true,
-      message: "Blog deleted successfully!",
+      message: "Blog deleted successfully",
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
