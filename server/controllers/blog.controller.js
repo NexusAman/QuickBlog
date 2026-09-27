@@ -1,6 +1,7 @@
 import fs from "fs";
 import imagekit from "../config/imageKit.js";
 import Blog from "../models/Blog.model.js";
+import Comment from "../models/Comment.model.js";
 
 export const addBlog = async (req, res) => {
   try {
@@ -103,7 +104,7 @@ export const getBlogById = async (req, res) => {
 
 export const deleteBlogById = async (req, res) => {
   try {
-    const {id} = req.body;
+    const { id } = req.body;
     const blog = await Blog.findById(id);
 
     if (!blog) {
@@ -138,6 +139,55 @@ export const togglePublish = async (req, res) => {
       success: true,
       message: "Blog status updated!",
     });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const addComment = async (req, res) => {
+  try {
+    const { blog, name, content } = req.body;
+
+    if (!blog || !name || !content) {
+      return res.status(401).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+    await Comment.create({ blog, name, content });
+    return res.status(201).json({
+      success: true,
+      message: "Comment added for review!",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getBlogComments = async (req, res) => {
+  try {
+    const { blogId } = req.body;
+
+    if (!blogId) {
+      return res.status(401).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+
+    const comments = await Comment.find({
+      blog: blogId,
+      isApproved: true,
+    }).sort({ createdAt: -1 });
+
+    if (comments.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No approved comments found",
+      });
+    }
+
+    return res.status(200).json({ success: true, comments });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
