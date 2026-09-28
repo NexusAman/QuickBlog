@@ -1,4 +1,4 @@
-`import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { blog_data } from '../../assets/assets';
 import BlogTableItem from '../../components/admin/BlogTableItem';
 
@@ -42,4 +42,3 @@ const ListBlog = () => {
 }
 
 export default ListBlog
-`
