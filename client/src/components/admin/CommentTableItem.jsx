@@ -21,10 +21,7 @@ const CommentTableItem = ({ comment, fetchComments }) => {
             {BlogDate.toLocaleDateString()}
         </td>
         <td className='px-6 py-4'>
-            {BlogDate.toLocaleDateString()}
-        </td>
-        <td className='px-6 py-4'>
-            <div className='inline-flex items-center gap-40'>
+            <div className='inline-flex items-center gap-4'>
                 {!comment.isApproved ?
                     <img src={assets.tick_icon} alt="" className='w-5 hover:scale-110 transition-all cursor-pointer' /> 
                     : <p className='text-xs border border-green-100 bg-green-600 rounded-full px-3 py-1'> Approved </p>
