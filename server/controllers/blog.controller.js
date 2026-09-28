@@ -113,9 +113,12 @@ export const deleteBlogById = async (req, res) => {
         message: "Blog not found",
       });
     }
-
+    
     await imagekit.files.delete(blog.imageFileId);
     await Blog.findByIdAndDelete(id);
+
+    // Delete all blogs associated with the blog
+    await Comment.deleteMany({blog: id});
 
     return res.json({
       success: true,
