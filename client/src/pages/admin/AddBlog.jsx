@@ -9,6 +9,10 @@ const AddBlog = () => {
   const [category, setCategory] = useState('Startup');
   const [isPublished, setIsPublished] = useState(false);
 
+  const generateContent = async() => {
+    
+  }
+
   const onSubmitHandler = async(e) => {
     e.preventDefault();
   }
@@ -22,6 +26,17 @@ const AddBlog = () => {
         <img src={!image ? assets. upload_area : URL.createObjectURL(image)} alt="" className='mt-2 h-16 rounded cursor-pointer'/>
         <input onChange={(e) => setImage(e.target.files[0])} type="file" id='image' hidden required/>
       </label>
+
+      <p className='mt-4'> Blog Title </p>
+      <input type="text" onChange={e => setTitle(e.target.value)} value={title} placeholder='Type here' required className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded' />
+
+      <p className='mt-4'> Sub title </p>
+      <input type="text" onChange={e => setSubTitle(e.target.value)} value={subTitle} placeholder='Type here' required className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded' />
+
+      <p className='mt-4'> Description </p>
+      <div className='max-w-lg h-74 pb-16 sm:pb-10 pt-10 relative'>
+        <button type='button' className='absolute bottom-1 right-2 ml-2 text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer'> Generate with AI </button>
+      </div>
     </div>
   </form>
 
