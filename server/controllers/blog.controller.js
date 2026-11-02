@@ -2,6 +2,7 @@ import fs from "fs";
 import imagekit from "../config/imageKit.js";
 import Blog from "../models/Blog.model.js";
 import Comment from "../models/Comment.model.js";
+import main from "../config/groq.js";
 
 export const addBlog = async (req, res) => {
   try {
@@ -113,12 +114,12 @@ export const deleteBlogById = async (req, res) => {
         message: "Blog not found",
       });
     }
-    
+
     await imagekit.files.delete(blog.imageFileId);
     await Blog.findByIdAndDelete(id);
 
     // Delete all blogs associated with the blog
-    await Comment.deleteMany({blog: id});
+    await Comment.deleteMany({ blog: id });
 
     return res.json({
       success: true,
@@ -193,5 +194,52 @@ export const getBlogComments = async (req, res) => {
     return res.status(200).json({ success: true, comments });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const generateContent = async (req, res) => {
+  try {
+    const topic = req.body.prompt?.trim();
+    if (!topic) {
+      return res.status(400).json({
+        success: false,
+        message: "A blog topic is required",
+      });
+    }
+
+    const content = await main(
+      `Topic: ${JSON.stringify(topic)}
+
+Write a high-quality, professional blog post about the topic above.
+
+Structure:
+- Start with one specific, compelling title using "#".
+- Open with a concise hook that explains why the topic matters.
+- Use 4 to 6 descriptive "##" section headings in a logical progression.
+- Explain each idea with well-developed paragraphs and concrete examples.
+- Include practical takeaways or actionable advice where appropriate.
+- Use bullet or numbered lists only when they improve readability.
+- End with a memorable conclusion that reinforces the main insight.
+
+Formatting rules:
+- Return only the blog content, with no preface or closing note.
+- Use Markdown that can be converted to a Quill editor.
+- Never use tables, pipe characters for columns, HTML, code blocks, or JSON.
+- Do not use headings such as "Introduction" or "Conclusion" unless they genuinely suit the topic.
+- Aim for approximately 700 to 1,000 words without padding.
+- Do not ask for another topic.`,
+    );
+
+    return res.status(200).json({
+      success: true,
+      content,
+    });
+  } catch (error) {
+    console.error("Groq content generation failed:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to generate blog content",
+    });
   }
 };
