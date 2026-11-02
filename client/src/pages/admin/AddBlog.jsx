@@ -4,10 +4,12 @@ import Quill from "quill";
 
 import { useAppContext } from "../../context/AppContext.jsx";
 import toast from "react-hot-toast";
+import { marked } from "marked";
 
 const AddBlog = () => {
   const { axios } = useAppContext();
   const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [image, setImage] = useState(false);
   const [title, setTitle] = useState("");
@@ -18,7 +20,28 @@ const AddBlog = () => {
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
-  const generateContent = async () => {};
+  const generateContent = async () => {
+    const topic = title.trim();
+    if (!topic) return toast.error("Please enter a title");
+
+    try {
+      setLoading(true);
+      const { data } = await axios.post("/api/blog/generate", {
+        prompt: topic,
+      });
+      if (data.success) {
+        const html = marked.parse(data.content);
+        quillRef.current.setText("");
+        quillRef.current.clipboard.dangerouslyPasteHTML(0, html, "api");
+      } else {
+        toast.error(data.message || "Unable to generate blog content");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -105,14 +128,22 @@ const AddBlog = () => {
         <p className="mt-4"> Description </p>
         <div className="max-w-lg h-74 pb-16 sm:pb-10 pt-2 relative">
           <div ref={editorRef}></div>
-
+          {loading && (
+            <div className="absolute right-0 top-0 bottom-0 left-0 flex items-center justify-center bg-black/10 mt-2">
+              <div className="w-8 h-8 rounded-full border-2 border-t-white animate-spin">
+                {" "}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="max-w-lg flex justify-end">
           <button
             onClick={generateContent}
+            disabled={loading}
             type="button"
-            className="absolute bottom-1 right-2 ml-2 px-4 py-1.5 rounded-lg text-white font-medium text-sm cursor-pointer bg-linear-to-r from-fuchsia-600 via-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-200"
+            className="mt-2 px-4 py-1.5 rounded-lg text-white font-medium text-sm cursor-pointer bg-linear-to-r from-fuchsia-600 via-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-200"
           >
-            {" "}
-            Generate with AI{" "}
+            {loading ? "Generating..." : "Generate with AI"}
           </button>
         </div>
 
