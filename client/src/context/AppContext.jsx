@@ -10,9 +10,19 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [token, setTokenState] = useState(() => localStorage.getItem("token"));
   const [blogs, setBlogs] = useState([]);
   const [input, setInput] = useState("");
+
+  const setToken = (nextToken) => {
+    setTokenState(nextToken);
+
+    if (nextToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${nextToken}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  };
 
   const fetchBlogs = async () => {
     try {
@@ -27,6 +37,8 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
     }
   }, [token]);
 
