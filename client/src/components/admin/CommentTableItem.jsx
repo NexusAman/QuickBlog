@@ -29,7 +29,7 @@ const CommentTableItem = ({ comment, fetchComments }) => {
       );
       if (!confirm) return;
 
-      const { data } = await axios.post("/api/blog/delete", {
+      const { data } = await axios.post("/api/admin/delete-comment", {
         id: _id,
       });
       if (data.success) {
